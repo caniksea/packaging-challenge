@@ -17,7 +17,11 @@ class PackerTest {
     void pack() throws APIException {
         File file = new File("src/main/test/resources/example_input");
         String filePath = file.getAbsolutePath();
+        String expected = "4\n-\n2,7\n8,9";
         String result = Packer.pack(filePath);
-        System.out.println(result);
+        assertAll(
+                () -> assertNotNull(result),
+                () -> assertEquals(expected, result)
+        );
     }
 }
