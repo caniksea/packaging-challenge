@@ -19,7 +19,6 @@ import java.util.stream.Stream;
 public class Packer {
 
   private static int lineCounter = 0, itemCounter = 0; // counters used for error reporting.
-  private final String ITEM_INDEX = "index";
 
   private Packer() {
   }
@@ -51,18 +50,41 @@ public class Packer {
     return Optional.empty();
   }
 
+  /**
+   * check for parseable big decimal on item data
+   *
+   * @param data
+   * @param dataType
+   * @return
+   */
   private static BigDecimal getBDItemValue(String data, String dataType) {
     checkNullItem(data, dataType);
+    // if item data is cost, check for currency and remove if present.
     if (dataType.equalsIgnoreCase(Constant.ITEM_COST.VALUE) && !NumberUtils.isParsable(data))
         data = data.substring(1);
-    if (!NumberUtils.isParsable(data)) throw new RuntimeException(String.format("Invalid value for item %s provided at line: %s, item data position: %s", dataType, lineCounter, itemCounter));
+    if (!NumberUtils.isParsable(data))
+      throw new RuntimeException(String.format("Invalid value for item %s provided at line: %s, item data position: %s", dataType, lineCounter, itemCounter));
     return new BigDecimal(data);
   }
 
+  /**
+   * check for null entry on item data
+   *
+   * @param data
+   * @param dataType
+   */
   private static void checkNullItem(String data, String dataType) {
-    if (data.isEmpty()) throw new RuntimeException(String.format("No value for item %s provided at line: %s, item data position: %s", dataType, lineCounter, itemCounter));
+    if (data.isEmpty())
+      throw new RuntimeException(String.format("No value for item %s provided at line: %s, item data position: %s", dataType, lineCounter, itemCounter));
   }
 
+  /**
+   * check for parseable integer on item data
+   *
+   * @param data
+   * @param dataType
+   * @return
+   */
   private static int getIntegerItemValue(String data, String dataType) {
     checkNullItem(data, dataType);
     if (!NumberUtils.isParsable(data)) throw new RuntimeException(String.format("Invalid value for item %s provided at line: %s, item data position: %s", dataType, lineCounter, itemCounter));
@@ -98,6 +120,12 @@ public class Packer {
     return new PackageDetail(maxWeight, packageItems);
   }
 
+  /**
+   * check max weight for package string data
+   *
+   * @param data
+   * @return
+   */
   private static BigDecimal getMaxWeight(String data) {
     if (data.isEmpty()) throw new RuntimeException("No max weight provided at line: " + lineCounter);
     if (!NumberUtils.isParsable(data)) throw new RuntimeException("Invalid max weight provided at line: " + lineCounter);
